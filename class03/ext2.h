@@ -3,38 +3,18 @@
 #include <linux/types.h>
 #include <linux/fs.h>
 
-#ifndef BLOCK_SIZE
-#define BLOCK_SIZE 4096	/* TODO get BLOCK_SIZE from superblock */
-#endif
-
 #define	EXT2_NDIR_BLOCKS		12						/* Direct blocks */
 #define	EXT2_IND_BLOCK			EXT2_NDIR_BLOCKS		/* Indirect blocks */
 #define	EXT2_DIND_BLOCK			(EXT2_IND_BLOCK + 1)	/* Double indirect */
 #define	EXT2_TIND_BLOCK			(EXT2_DIND_BLOCK + 1)	/* Triple indirect */
 #define	EXT2_N_BLOCKS			(EXT2_TIND_BLOCK + 1)
 
-/***** #include <linux/uidgid.h>  *****/
+#define EXT2_S_IFMT				0xF000	/* File type mask */
+#define EXT2_S_IFREG			0x8000	/* Regular file */
+#define EXT2_S_ISDIR			0x4000	/* Directory */
+// TODO 
 
-struct ext2_inode {
-	__le16	i_mode;		/* File mode */
-	__le16	i_uid;		/* Low 16 bits of Owner Uid */
-	__le32	i_size;		/* Size in bytes */
-	__le32	i_atime;	/* Access time */
-	__le32	i_ctime;	/* Creation time */
-	__le32	i_mtime;	/* Modification time */
-	__le32	i_dtime;	/* Deletion Time */
-	__le16	i_gid;		/* Low 16 bits of Group Id */
-	__le16	i_links_count;	/* Links count */
-	__le32	i_blocks;	/* Blocks count */
-	__le32	i_flags;	/* File flags */
-	__le32	i_osd1;		/* OS dependent 1 */
-	__le32	i_block[EXT2_N_BLOCKS];/* Pointers to blocks */
-	__le32	i_generation;	/* File version (for NFS) */
-	__le32	i_file_acl;	/* File ACL */
-	__le32	i_dir_acl;	/* Directory ACL */
-	__le32	i_faddr;	/* Fragment address */
-	__u8	i_osd2[12];	/* OS dependent 2 */
-};
+#define EXT2_ROOT_INODE_NO		1 /* Inode number of root directory */
 
 struct ext2_super_block {
 	__le32	s_inodes_count;		/* Inodes count */
@@ -106,6 +86,54 @@ struct ext2_super_block {
 	__le32	s_default_mount_opts;
  	__le32	s_first_meta_bg; 	/* First metablock block group */
 	__u32	s_reserved[190];	/* Padding to the end of the block */
+};
+
+struct ext2_group_desc
+{
+	__le32	bg_block_bitmap;		/* Blocks bitmap block */
+	__le32	bg_inode_bitmap;		/* Inodes bitmap block */
+	__le32	bg_inode_table;		/* Inodes table block */
+	__le16	bg_free_blocks_count;	/* Free blocks count */
+	__le16	bg_free_inodes_count;	/* Free inodes count */
+	__le16	bg_used_dirs_count;	/* Directories count */
+	__le16	bg_pad;
+	__le32	bg_reserved[3];
+};
+
+struct ext2_inode {
+	__le16	i_mode;		/* File mode */
+	__le16	i_uid;		/* Low 16 bits of Owner Uid */
+	__le32	i_size;		/* Size in bytes */
+	__le32	i_atime;	/* Access time */
+	__le32	i_ctime;	/* Creation time */
+	__le32	i_mtime;	/* Modification time */
+	__le32	i_dtime;	/* Deletion Time */
+	__le16	i_gid;		/* Low 16 bits of Group Id */
+	__le16	i_links_count;	/* Links count */
+	__le32	i_blocks;	/* Blocks count */
+	__le32	i_flags;	/* File flags */
+	__le32	i_osd1;		/* OS dependent 1 */
+	__le32	i_block[EXT2_N_BLOCKS];/* Pointers to blocks */
+	__le32	i_generation;	/* File version (for NFS) */
+	__le32	i_file_acl;	/* File ACL */
+	__le32	i_dir_acl;	/* Directory ACL */
+	__le32	i_faddr;	/* Fragment address */
+	__u8	i_osd2[12];	/* OS dependent 2 */
+};
+
+struct ext2_dir_entry {
+	__le32	inode;			/* Inode number */
+	__le16	rec_len;		/* Directory entry length */
+	__le16	name_len;		/* Name length */
+	char	name[];			/* File name, up to EXT2_NAME_LEN */
+};
+
+struct ext2_dir_entry_2 {
+	__le32	inode;			/* Inode number */
+	__le16	rec_len;		/* Directory entry length */
+	__u8	name_len;		/* Name length */
+	__u8	file_type;
+	char	name[];			/* File name, up to EXT2_NAME_LEN */
 };
 
 #endif	/* EXT2_H */
