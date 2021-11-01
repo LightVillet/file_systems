@@ -336,34 +336,10 @@ int main() {
 	}
 	read_group_desc(buf, &group_descriptor);
 	//print_group_desc(&group_descriptor);
-	/***** Read inode bitmap *****/
-	int block_size = 1024 << superblock.s_log_block_size;
-	char inode_bitmap[block_size];
-	/*res = lseek(fd, block_size * group_descriptor.bg_inode_bitmap, SEEK_SET);
-	if (res < 0)
-	{
-		fprintf(stderr, "Error seeking %s: %s\n", DEVICE_PATH, strerror(errno));
-		return 3;
-	}
-	res = read(fd, &inode_bitmap, block_size);
-	if (res != block_size) {
-		fprintf(stderr, "Error reading %s: %s\n", DEVICE_PATH, strerror(errno));
-		return 2;
-	}
-	printf("Inode bitmap: ");
-	for (int i = 0; i < superblock.s_inodes_count / 8; i++)
-		printf("%02X ", inode_bitmap[i]);
-	*/
-	/***** Reading inode table *****/
-	res = lseek(fd, block_size * group_descriptor.bg_inode_table, SEEK_SET);
-	if (res < 0) {
-		fprintf(stderr, "Error seeking %s: %s\n", DEVICE_PATH, strerror(errno));
-		return 3;
-	}
 	/***** Reading inode *****/
 	unsigned char *data = read_inode_data(fd, EXT2_ROOT_INODE_NO);
 	printf("%s", data);
-	//printf("%02X ", buf[0]);
+	free(data);
 	free(buf);
 	close(fd);
 	return 0;
