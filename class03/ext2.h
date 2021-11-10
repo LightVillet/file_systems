@@ -2,6 +2,9 @@
 #define EXT2_H
 #include <linux/types.h>
 #include <linux/fs.h>
+#include <stdint.h>
+
+#define BOOT_LOADER_SPACE		1024 /* Number of bytes to boot loader */
 
 #define	EXT2_NDIR_BLOCKS		12						/* Direct blocks */
 #define	EXT2_IND_BLOCK			EXT2_NDIR_BLOCKS		/* Indirect blocks */
@@ -14,7 +17,20 @@
 #define EXT2_S_ISDIR			0x4000	/* Directory */
 // TODO 
 
-#define EXT2_ROOT_INODE_NO		1 /* Inode number of root directory */
+#define EXT2_ROOT_INO			2 /* Inode number of root directory */
+
+/*** macro deinition to determine byte order (from stackoverflow) ***/
+#define IS_BIG_ENDIAN (!*(unsigned char *)&(uint16_t){1})
+
+/*** For determing file type ***/
+#define IFREG(mode) (((mode) & EXT2_S_IFMT) == EXT2_S_IFREG)
+#define ISDIR(mode) (((mode) & EXT2_S_IFMT) == EXT2_S_ISDIR)
+
+/*** typedefs for shorter types ***/
+typedef unsigned char u8;
+typedef unsigned short u16;
+typedef unsigned int u32;
+typedef unsigned long u64;
 
 struct ext2_super_block {
 	__le32	s_inodes_count;		/* Inodes count */
@@ -136,4 +152,21 @@ struct ext2_dir_entry_2 {
 	char	name[];			/* File name, up to EXT2_NAME_LEN */
 };
 
+struct ext2 {
+    // a file that contains an ext2 image
+    int fd; 
+    // ext2 properties that I will need
+    u32 blocksize;
+	u16 inode_size;
+	u32 inode_table;
+};
+
+u32 le32_to_cpu(__le32 x);
+u16 le16_to_cpu(__le16 x);
+
+int ext2_open(struct ext2 *ext2, const char *path);
+int ext2_close(const struct ext2 *ext2);
+int read_inode(const struct ext2 *ext2, struct ext2_inode *inode, u32 inode_number);
+
 #endif	/* EXT2_H */
+
