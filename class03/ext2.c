@@ -7,7 +7,7 @@
 
 /******************* 
  * Command that I used to create ext2:
- * sudo mke2fs -b 1024 -d ./ext2/ -O ^sparse_super  -O ^resize_inode -O ^large_file -O ^filetype -O ^ext_attr -O ^dir_index -e panic -I 128 -t ext2 -c -c -L ext2_fs -r 0 /dev/sdc15 1m
+ * sudo mke2fs -b 1024 -d ./ext2/ -O ^sparse_super  -O ^resize_inode -O ^large_file -O ^filetype -O ^ext_attr -O ^dir_index -e panic -I 128 -t ext2 -c -c -L ext2_fs -r 0 /dev/sdc15 3m
  * ./ext2/ directory contains small_file and large_file and directory sample_dir
  * sample_dir contains very_large_file that uses indirect blocks
  ******************/
