@@ -17,20 +17,24 @@
 #define EXT2_S_ISDIR			0x4000	/* Directory */
 // TODO 
 
-#define EXT2_ROOT_INO			2 /* Inode number of root directory */
+/*** Error codes ***/
+#define ERR_FS_IO				-5000 /* Error while reading fs */
+#define ERR_FS_NOT_EXT2			-5001 /* Not ext2 fs */
+#define ERR_FS_INCOMPAT			-5002 /* Incompatible fs */
+#define ERR_FS_NOT_DIR			-5003 /* Iterating not directory */
+#define ERR_FS_NOT_FOUND		-5004 /* Directory by path not found */
 
-/*** macro deinition to determine byte order (from stackoverflow) ***/
-#define IS_BIG_ENDIAN (!*(unsigned char *)&(uint16_t){1})
+#define EXT2_ROOT_INO			2 /* Inode number of root directory */
 
 /*** For determing file type ***/
 #define IFREG(mode) (((mode) & EXT2_S_IFMT) == EXT2_S_IFREG)
 #define ISDIR(mode) (((mode) & EXT2_S_IFMT) == EXT2_S_ISDIR)
 
 /*** typedefs for shorter types ***/
-typedef unsigned char u8;
-typedef unsigned short u16;
-typedef unsigned int u32;
-typedef unsigned long u64;
+typedef uint8_t u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+typedef uint64_t u64;
 
 struct ext2_super_block {
 	__le32	s_inodes_count;		/* Inodes count */
@@ -100,7 +104,7 @@ struct ext2_super_block {
 	__u8	s_reserved_char_pad;
 	__u16	s_reserved_word_pad;
 	__le32	s_default_mount_opts;
- 	__le32	s_first_meta_bg; 	/* First metablock block group */
+	__le32	s_first_meta_bg; 	/* First metablock block group */
 	__u32	s_reserved[190];	/* Padding to the end of the block */
 };
 
@@ -153,16 +157,14 @@ struct ext2_dir_entry_2 {
 };
 
 struct ext2 {
-    // a file that contains an ext2 image
-    int fd; 
-    // ext2 properties that I will need
-    u32 blocksize;
+	// a file that contains an ext2 image
+	int fd; 
+	// ext2 properties that I will need
+	u32 blocksize;
 	u16 inode_size;
-	u32 inode_table;
+	u32 blocks_per_group;
+	u32 inodes_per_group;
 };
-
-u32 le32_to_cpu(__le32 x);
-u16 le16_to_cpu(__le16 x);
 
 int ext2_open(struct ext2 *ext2, const char *path);
 int ext2_close(const struct ext2 *ext2);
